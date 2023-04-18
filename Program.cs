@@ -4,9 +4,8 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Reflection.Metadata;
 
-namespace LearnOpenTK
-{
-    public class Game : GameWindow
+
+public class Game : GameWindow
     {
         int VertexBufferObject;
         Shader shader;
@@ -22,7 +21,17 @@ namespace LearnOpenTK
 
         public Game(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { Size = (width, height), Title = title }) { }
 
+        protected override void OnUpdateFrame(FrameEventArgs args)
+        {
+            KeyboardState input = KeyboardState;
 
+            if (input.IsKeyDown(Keys.Escape))
+            {
+                Close();
+            }
+
+            base.OnUpdateFrame(args);
+        }
 
         protected override void OnLoad()
         {
@@ -42,13 +51,10 @@ namespace LearnOpenTK
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
 
-
-
-
             base.OnLoad();
         }
 
-        protected override void OnRenderFrame(FrameEventArgs e)
+        protected override void OnRenderFrame(FrameEventArgs args)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
@@ -58,28 +64,7 @@ namespace LearnOpenTK
 
             SwapBuffers();
 
-            base.OnRenderFrame(e);
-        }
-
-
-        protected override void OnUnload()
-        {
-            base.OnUnload();
-            shader.Dispose();
-        }
-
-
-        protected override void OnUpdateFrame(FrameEventArgs e)
-        {
-            base.OnUpdateFrame(e);
-
-            KeyboardState input = KeyboardState;
-
-            if (input.IsKeyDown(Keys.Escape))
-            {
-                Close();
-            }
-
+            base.OnRenderFrame(args);
         }
 
         protected override void OnResize(ResizeEventArgs e)
@@ -89,12 +74,9 @@ namespace LearnOpenTK
             GL.Viewport(0, 0, e.Width, e.Height);
         }
 
-        static void Main(string[] args)
+        protected override void OnUnload()
         {
-            using (Game game = new Game(1600, 1200, "LearnOpenTK"))
-            {
-                game.Run();
-            }
+            shader.Dispose();
+            base.OnUnload();
         }
     }
-}
