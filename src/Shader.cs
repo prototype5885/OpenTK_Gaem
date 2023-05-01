@@ -1,30 +1,31 @@
 ﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using System.Reflection.Metadata;
 
+namespace OpenTK_Gaem;
 public class Shader
 {
-    int Handle;
+    int Handle; 
     int VertexShader;
     int FragmentShader;
 
+    private int success;
+
     public Shader(string vertexPath, string fragmentPath)
     {
-        string VertexShaderSource = File.ReadAllText(vertexPath);
-
-        string FragmentShaderSource = File.ReadAllText(fragmentPath);
-
+        // reading the shader text
+        string vertexShaderSource = File.ReadAllText(vertexPath);
+        string fragmentShaderSource = File.ReadAllText(fragmentPath);
+        
+        // generating shader and binding the source code to the shader
         VertexShader = GL.CreateShader(ShaderType.VertexShader);
-        GL.ShaderSource(VertexShader, VertexShaderSource);
+        GL.ShaderSource(VertexShader, vertexShaderSource);
 
         FragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-        GL.ShaderSource(FragmentShader, FragmentShaderSource);
-
+        GL.ShaderSource(FragmentShader, fragmentShaderSource);
+        
+        // compiling shader
+        
         GL.CompileShader(VertexShader);
-
-        GL.GetShader(VertexShader, ShaderParameter.CompileStatus, out int success);
+        GL.GetShader(VertexShader, ShaderParameter.CompileStatus, out success);
         if (success == 0)
         {
             string infoLog = GL.GetShaderInfoLog(VertexShader);
@@ -32,14 +33,15 @@ public class Shader
         }
 
         GL.CompileShader(FragmentShader);
-
-        GL.GetShader(FragmentShader, ShaderParameter.CompileStatus, out _);
+        GL.GetShader(FragmentShader, ShaderParameter.CompileStatus, out success);
         if (success == 0)
         {
             string infoLog = GL.GetShaderInfoLog(FragmentShader);
             Console.WriteLine(infoLog);
         }
-
+        
+        // linking shader
+        
         Handle = GL.CreateProgram();
 
         GL.AttachShader(Handle, VertexShader);
@@ -47,23 +49,28 @@ public class Shader
 
         GL.LinkProgram(Handle);
 
-        GL.GetProgram(Handle, GetProgramParameterName.LinkStatus, out _);
+        GL.GetProgram(Handle, GetProgramParameterName.LinkStatus, out success);
         if (success == 0)
         {
             string infoLog = GL.GetProgramInfoLog(Handle);
             Console.WriteLine(infoLog);
         }
-
+        
+        // delete source of the shader
+        
         GL.DetachShader(Handle, VertexShader);
         GL.DetachShader(Handle, FragmentShader);
         GL.DeleteShader(FragmentShader);
         GL.DeleteShader(VertexShader);
     }
-    public void Use()
+    
+    public void Use() // use the shader
     {
         GL.UseProgram(Handle);
     }
-
+    
+    // clean up the handle
+    
     private bool disposedValue = false;
 
     protected virtual void Dispose(bool disposing)
@@ -83,8 +90,7 @@ public class Shader
             Console.WriteLine("GPU Resource leak! Did you forget to call Dispose()?");
         }
     }
-
-
+    
     public void Dispose()
     {
         Dispose(true);
