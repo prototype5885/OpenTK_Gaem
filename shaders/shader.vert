@@ -6,9 +6,12 @@ layout(location = 1) in vec2 aTexCoord;
 
 out vec2 texCoord;
 
+uniform mat4 transform;
+
 void main(void)
 {
+
+    gl_Position = vec4(aPosition, 1.0) * transform;
     texCoord = aTexCoord;
 
-    gl_Position = vec4(aPosition, 1.0);
 }

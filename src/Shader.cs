@@ -36,7 +36,7 @@ namespace LearnOpenTK.Common
             GL.ShaderSource(vertexShader, shaderSource);
 
             // And then compile
-            CompileShader(vertexShader);
+            GL.CompileShader(vertexShader);
 
             // We do the same for the fragment shader.
             shaderSource = File.ReadAllText(fragPath);
